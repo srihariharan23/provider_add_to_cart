@@ -1,0 +1,54 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../cart_provider.dart';
+
+class CartWidget extends StatelessWidget {
+  const CartWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context);
+    final cartItems = cartProvider.cartItems;
+
+    return ListView.builder(
+      itemCount: cartItems.length,
+      itemBuilder: (context, index) {
+        final item = cartItems[index];
+        return ListTile(
+          leading: Image.network(item.product.imageUrl),
+          title: Text(item.product.name),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  '\$${(item.product.price * item.quantity).toStringAsFixed(2)}'),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () {
+                      if (item.quantity > 1) {
+                        cartProvider.decreaseQuantity(item.product);
+                      }
+                    },
+                  ),
+                  Text(item.quantity.toString()),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {
+                      cartProvider.addToCart(item.product);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.remove_shopping_cart),
+            onPressed: () => cartProvider.removeFromCart(item.product),
+          ),
+        );
+      },
+    );
+  }
+}
